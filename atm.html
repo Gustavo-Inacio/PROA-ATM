@@ -1,0 +1,215 @@
+<html>
+<head>
+	<script>
+		let saldo = 100.5; //Float 1.36
+		let userName = "";
+		let extrato = []; // todas as vezes que for mudado o saldo, a quantia movida é salva
+
+		userName = prompt("Olá, qual é o seu Nome?");
+		alert(`Olá ${userName} é um prazer ter você por aqui!`);
+
+		function closeWindow (){
+			window.close();
+		}
+
+		const atm = { // todas as funcoes relacionadas ao atm
+			verificar_senha : () => {
+				let senha = prompt("Insira a senha.");
+				if(senha == "3589") return true;
+				else return false;
+			},
+
+			ver_saldo : {
+				code : 1,
+				title: "Saldo",
+				execute : () => {
+					if(!atm.verificar_senha()) 
+						alert("Senha inválida");
+					else
+						alert('Seu saldo atual é: ' + saldo);
+					
+
+					inicio();
+				},
+			},
+
+			retirar_dinheiro : (quantidade) => {
+				if((quantidade > saldo) || (quantidade == 0) || quantidade <= 0) {
+					return false;
+					console.log("a")
+				}
+				else{
+					if(!atm.verificar_senha()) {
+						alert("Senha inválida");
+						return false;
+					}
+
+					saldo -= quantidade;
+					extrato.push(-quantidade);
+					return true;
+				}
+
+			},
+
+			add_dinheiro : (quantidade) => {
+				if(quantidade > 0){
+					saldo += quantidade;
+					extrato.push(`+${quantidade}`);
+				}
+				
+				return (quantidade > 0)
+			},
+			
+			fazer_deposito : {
+				code: 4,
+				title : "Depósito",
+				execute : () => {
+					let deposito = parseFloat(prompt('Qual o valor para depósito?'));
+					// Not a Number
+					if (isNaN(deposito) || deposito === '') {
+						alert('Por favor, informe um número:');
+						atm.fazer_deposito.execute();
+					} else {
+
+						if(atm.add_dinheiro(deposito)){
+							let verify = confirm("Você deseja conferir o seu saldo?");
+							if(verify) atm.ver_saldo.execute();
+							else atm.inicio();
+						}
+						else{
+							alert(`Operação Inválida`);
+							inicio();
+						}
+					}
+				},
+			},
+
+			fazer_saque: {
+				code: 3,
+				title: "Saque",
+				execute : () => {
+					if(!atm.verificar_senha()) {
+						alert("Senha inválida");
+						inicio();
+					}
+				
+					let saque = parseFloat(prompt('Qual o valor para saque?'));
+					if (isNaN(saque) || saque === '') {
+						alert('Por favor, informe um número:');
+						atm.fazer_saque.execute();
+					} else {
+						
+						if(atm.retirar_dinheiro(saque)){
+							let verify = confirm("Você deseja conferir o seu saldo?");
+
+							if(verify) atm.ver_saldo.execute();
+							else atm.inicio();
+						}
+						else{
+							alert("Operação INVÁLIDA");
+							inicio();
+						}
+						
+					}
+				}
+			},
+
+			extrato: {
+				code: 2,
+				title: "Extrato",
+				execute : () => {
+					if(!atm.verificar_senha()) {
+						alert("Senha inválida");
+						inicio();
+					}
+					
+					alert(`De acordo com o seu histórico, você gastou a seguinte sequência: ${extrato}`);
+
+					inicio();
+				}
+			},
+
+			transfer: {
+				code: 5,
+				title: "Tranferência",
+				execute : () => {
+					if(!atm.verificar_senha()) {
+						alert("Senha inválida");
+						inicio();
+					}
+
+					let acountNumber = Number(prompt("Insira o número da conta de tranferência"));
+					let tranferQunatity = Number(prompt("Insira o valor da tranferência."));
+
+					if(isNaN(acountNumber) || isNaN(tranferQunatity)){
+						let decision = confirm("Insira apenas números! \n Você deseja tentar novamente?");
+
+						if(decision) atm.transfer.execute();
+						else inicio();
+					}
+					else{
+						if(atm.retirar_dinheiro(tranferQunatity)){
+							alert(`Sua tranferência de R$${tranferQunatity} para a conta ${acountNumber} foi realizada com sucesso!`);
+						}
+						else{
+							alert("Operação INVÁLIDA");
+						}
+					}
+
+					inicio();
+					
+				}
+			},
+
+			sair : {
+				code : 6,
+				title: "Sair",
+				execute : () => {
+					let confirma = confirm('Você deseja sair?');
+					if (confirma) {
+						alert(`${userName}, foi um prazer ter você por aqui!`)
+						closeWindow();
+					} else {
+						inicio();
+					}
+				}
+			},
+
+			erro : () => {
+				alert('Por favor, informe um número entre 1 e 6');
+				inicio();
+			}
+		};
+
+		function inicio() {
+			let escolha = parseInt(prompt(
+			`Selecione uma opção: \n ${atm.ver_saldo.code}.) ${atm.ver_saldo.title} \n ${atm.extrato.code}.) ${atm.extrato.title} \n ${atm.fazer_saque.code}.) ${atm.fazer_saque.title} \n ${atm.fazer_deposito.code}.) ${atm.fazer_deposito.title} \n ${atm.transfer.code}.) ${atm.transfer.title} \n ${atm.sair.code}.) ${atm.sair.title}`));
+
+			switch(escolha){
+				case 1 : atm.ver_saldo.execute();
+					break;
+				case 2 : atm.extrato.execute();
+					break;
+				case 3 : atm.fazer_saque.execute();
+					break;
+				case 4 : atm.fazer_deposito.execute();
+					break;
+				case 5 : atm.transfer.execute();
+					break;
+				case 6 : atm.sair.execute();
+					break;
+				default: 
+					atm.erro();
+
+			}
+		}		
+
+		 inicio();
+	</script>
+</head>
+
+<body>
+
+</body>
+
+</html>
